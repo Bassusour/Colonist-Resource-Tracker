@@ -1,5 +1,6 @@
-var players = [];
+const USERNAME = "AAAAAA#8817";
 
+var players = [];
 class Player {
     constructor(name) {
       this.lumber = 0;
@@ -7,7 +8,8 @@ class Player {
       this.wool = 0;
       this.grain = 0;
       this.ore = 0;
-      this.unknown = 0;
+      this.stolenFromPlayer = 0;    // <= 0
+      this.stolenByPlayer = 0;      // >= 0
       this.name = name;
     }
 }
@@ -23,22 +25,18 @@ function waitTillGameIsLoaded() {
     observer.observe(logDiv,config);
 
     var btnDiv = document.getElementById('help_buttons_section');
-    var menuDiv = document.createElement( 'div' );
-    var img = document.createElement( 'img' );
-    img.id = 'imgID';
-    img.src = '5.PNG'
-    menuDiv.innerHTML = 'Extra stuff <br /> test';
-    var btn = document.createElement( 'button' );
+    var menuDiv = document.createElement('div');
+    menuDiv.innerHTML = 'Nothing has happened yet. ';
+    var btn = document.createElement('button');
 
     document.body.appendChild( menuDiv );
-    menuDiv.appendChild(img);
     btnDiv.appendChild(btn);
 
     menuDiv.style.zIndex = 100;
-    menuDiv.id = 'myDivId';
+    menuDiv.id = 'resourceTrackerMenu';
     menuDiv.style.position = 'absolute';
     menuDiv.style.top = '25%';
-    menuDiv.style.left = '12%';
+    menuDiv.style.left = '10%';
     menuDiv.style.backgroundImage = 'linear-gradient(to bottom,#fcfaf5,#e2d7c4)';
     menuDiv.style.padding = '10px';
     menuDiv.style.color = 'black';
@@ -56,7 +54,7 @@ function waitTillGameIsLoaded() {
 }
 
 function updateText() {
-    const menu = document.getElementById('myDivId');
+    const menu = document.getElementById('resourceTrackerMenu');
     var text = "";
     for (var p of players) {
         text += p.name + ": " + 
@@ -65,8 +63,11 @@ function updateText() {
                 p.wool + " <img src=\"/dist/images/card_wool.svg?v149\" width=\"14.25px\" height=\"20px\">, " + 
                 p.grain + " <img src=\"/dist/images/card_grain.svg?v149\" width=\"14.25px\" height=\"20px\">,  " +
                 p.ore + " <img src=\"/dist/images/card_ore.svg?v149\" width=\"14.25px\" height=\"20px\">";
-        if(p.unknown > 0){
-            text += ", <img src=\"/dist/images/card_rescardback.svg?v149\" width=\"14.25px\" height=\"20px\"> ";
+        if(p.stolenFromPlayer != 0){
+            text += ", stolenFrom: " + p.stolenFromPlayer + " <img src=\"/dist/images/card_rescardback.svg?v149\" width=\"14.25px\" height=\"20px\"> ";
+        }
+        if(p.stolenByPlayer != 0){
+            text += ", stolenBy: " + p.stolenByPlayer + " <img src=\"/dist/images/card_rescardback.svg?v149\" width=\"14.25px\" height=\"20px\"> ";
         }
         text += " <br />";
     }
@@ -74,7 +75,7 @@ function updateText() {
 }
 
 function displayMenu() {
-    const menu = document.getElementById('myDivId');
+    const menu = document.getElementById('resourceTrackerMenu');
     if(menu.style.display === "none") {
         menu.style.display = "block";
     } else {
@@ -82,13 +83,13 @@ function displayMenu() {
     }
 }
 
-function updateResource(name, resource, amount) {
+function updateResource(player, resource, amount) {
     console.log(resource);
-    console.log(name);
+    console.log(player);
     var player;
 
     for(let p of players){
-        if(p.name === name){
+        if(p.name === player){
             player = p;
             break;
         }
@@ -96,28 +97,52 @@ function updateResource(name, resource, amount) {
 
     switch (resource) {
         case "lumber":
-            //check if an unknown card was used 
-            if((amount + player.lumber) < 0) {
-               player.unknown += (amount + player.lumber);
-               player.lumber += amount + (amount + player.lumber)*(-1);
-               break;
+            // If you use more resources than available
+            if(amount + player.lumber < 0 && player.stolenFromPlayer == 0) {
+                // counter decreases with the difference amount
+                player.stolenByPlayer += amount + player.lumber;
+                player.lumber = 0;
+                break;
             }
             player.lumber += amount;
             break;
         case "brick":
+            if(amount + player.brick < 0 && player.stolenFromPlayer == 0) {
+                player.stolenByPlayer += amount + player.brick;
+                player.brick = 0;
+                break;
+            }
             player.brick += amount;
             break;
         case "wool":
+            if(amount + player.wool < 0 && player.stolenFromPlayer == 0) {
+                player.stolenByPlayer += amount + player.wool;
+                player.wool = 0;
+                break;
+            }
             player.wool += amount;
             break;
         case "grain":
+            if(amount + player.grain < 0 && player.stolenFromPlayer == 0) {
+                player.stolenByPlayer += amount + player.grain;
+                player.grain = 0;
+                break;
+            }
             player.grain += amount;
             break;
         case "ore":
+            if(amount + player.ore < 0 && player.stolenFromPlayer == 0) {
+                player.stolenByPlayer += amount + player.ore;
+                player.ore = 0;
+                break;
+            }
             player.ore += amount;
             break;
-        case "unknown":
-            player.unknown += amount;
+        case "stolenFromPlayer":
+            player.stolenFromPlayer += amount;
+            break;
+        case "stolenByPlayer":
+            player.stolenByPlayer += amount;
             break;
     }
 }
@@ -142,6 +167,10 @@ const callback = async (mutation, observer) => {
         console.log(mutation);
 
         // for(const data of mutation[0].addedNodes[0].childNodes) {
+        // Simple text log that is irrelevant. 
+        if(mutation[0].addedNodes[0].childNodes.length == 1){
+            return;
+        }
         var text = String(mutation[0].addedNodes[0].childNodes[1].data);
         var player = text.split(' ')[0];
         var action = text.split(' ')[1];
@@ -149,35 +178,35 @@ const callback = async (mutation, observer) => {
         console.log(text);
         console.log(action);
 
-        createPlayerIfTheyDontExist(player);
+        if(player == "You" || player == "you"){
+            player = USERNAME
+        }
 
-        /*const mobilenet = require('@tensorflow-models/mobilenet');
-                    const img = document.getElementById('imgID');
-                    const model = await mobilenet.load();
-                    const predictions = await model.classify(img);
-                    console.log(predictions);*/
-
-        if(player === "Bot" || player === "Game"){
+        if(player === "Bot" || player === "Game" || player == "undefined"){
             return;
         }
+
+        createPlayerIfTheyDontExist(player);
 
         switch (action) {
             case "got:":
             case "received":
                 for(let i = 2; i < mutation[0].addedNodes[0].childNodes.length; i++){
-                    // stop if no longer a resource
-                    if(mutation[0].addedNodes[0].childNodes[i].nodeType != 1){
+                    // stop if no longer a resource NECESSARY?
+                    /*if(mutation[0].addedNodes[0].childNodes[i].nodeType != 1){
                         break;
-                    }
+                    }*/
                     resource = mutation[0].addedNodes[0].childNodes[i].alt;
                     updateResource(player, resource, 1);
                 }
                 break;
             case "traded:":
-                var player2 = String(mutation[0].addedNodes[0].childNodes[5].data).split(' ')[2]; 
+                var lengthOfChildnodes = mutation[0].addedNodes[0].childNodes.length;
+                var player2 = String(mutation[0].addedNodes[0].childNodes[lengthOfChildnodes - 1].data).split(':')[1].slice(1);
                 console.log(player2);
                 var flag = false;
                 for(let i = 2; i < mutation[0].addedNodes[0].childNodes.length; i++){
+                    // flag to differentiate between who receives the resources
                     if(mutation[0].addedNodes[0].childNodes[i].nodeType != 1){
                         flag = true;
                         continue;
@@ -215,11 +244,18 @@ const callback = async (mutation, observer) => {
                 updateResource(player, "wool", -1);
                 updateResource(player, "grain", -1);
                 updateResource(player, "ore", -1);
+                break;
+            case "stole:":
             case "stole":
                 var resource = mutation[0].addedNodes[0].childNodes[2].alt;
+                console.log(resource);
+                
                 // steal one hidden resource
                 if(resource === "card") {
-                    updateResource(player, "unknown", 1);
+                    var fromPlayer = String(mutation[0].addedNodes[0].childNodes[3].data).split(':')[1].slice(1);
+                    updateResource(player, "stolenByPlayer", 1);
+                    updateResource(fromPlayer, "stolenFromPlayer", -1);
+                    console.log(fromPlayer);
                 } else if(text.includes('Monopoly')) {
                     const amount = String(mutation[0].addedNodes[0].childNodes[1].data).split(':')[0].slice(-1);
                     updateResource(player, resource, amount);
@@ -243,39 +279,50 @@ const callback = async (mutation, observer) => {
                                 break;
                         }
                     }
-                    /*const mobilenet = require('@tensorflow-models/mobilenet');
-                    const img = document.getElementById('imgID');
-                    const model = await mobilenet.load();
-                    const predictions = await model.classify(img);
-                    console.log(predictions);*/
-                    // there can be unknown resources stolen
+                } else {
+                    // other players (" from: Culley")
+                    // ourself (" from you")
+                    var fromPlayer = String(mutation[0].addedNodes[0].childNodes[3].data).split(' ')[2];
 
+                    if(fromPlayer == "You" || fromPlayer == "you"){
+                        fromPlayer = USERNAME;
+                    }
+                    updateResource(player, resource, 1);
+                    updateResource(fromPlayer, resource, -1);
                 }
                 break;
             case "discarded:":
+                for(let i = 2; i < mutation[0].addedNodes[0].childNodes.length; i++){
+                    resource = mutation[0].addedNodes[0].childNodes[i].alt;
+                    updateResource(player, resource, -1);
+                }
                 break;
+            case "gave":
+                var iWhenStopped;
+                for(let i = 2; i < mutation[0].addedNodes[0].childNodes.length; i++){
+                    // Seperate 'gave' and 'took'
+                    if(mutation[0].addedNodes[0].childNodes[i].nodeType != 1){
+                        iWhenStopped = i;
+                        break;
+                    }
+                    resource = mutation[0].addedNodes[0].childNodes[i].alt;
+                    updateResource(player, resource, -1);
+                }
+                for(let i = iWhenStopped+1; i < mutation[0].addedNodes[0].childNodes.length; i++){
+                    resource = mutation[0].addedNodes[0].childNodes[i].alt;
+                    updateResource(player, resource, 1);
+                }
+                break;
+            case "took":
+                // year of plenty
+                var resource1 = mutation[0].addedNodes[0].childNodes[2].alt;
+                var resource2 = mutation[0].addedNodes[0].childNodes[4].alt;
+                updateResource(player, resource1, 1);
+                updateResource(player, resource2, 1);
         }
         
         updateText();
-
-        /*for(let i = 1; i < mutation[0].addedNodes[0].childNodes.length; i++) {
-          for(const data of mutation[0].addedNodes[0].childNodes) {
-            var currVal = mutation[0].addedNodes[0].childNodes[i];
-
-            if(data.nodeName === "HR"){ // horizontal line (also has nodetype == 3)
-                continue;
-            } else if(data.nodeType == 3) { // text
-                console.log(data.data);
-            } else if(data.nodeType == 1) { // img
-                console.log(data.alt);
-            }
-        }*/
-        
     }
   };
 
   waitTillGameIsLoaded();
-
-// linear-gradient(to bottom,#fcfaf5,#e2d7c4);
-// "include_globs" :   ["*#*"],
-// npm install @tensorflow/tfjs
