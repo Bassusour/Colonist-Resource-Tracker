@@ -8,6 +8,7 @@ Please note that it is not perfect, since not all necessary data is available th
 ## Setup
 1. Download this zip folder, and extract it. 
 2. Go to chrome://extensions/
-3. Click 'Load unpacked' in top left corner
-4. Select the extracted folder
-5. Enjoy! 
+3. Enable the 'Developer mode' in the top right corner
+4. Click 'Load unpacked' in top left corner
+5. Select the extracted folder
+6. Enjoy! 
