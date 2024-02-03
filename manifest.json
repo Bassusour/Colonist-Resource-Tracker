@@ -5,7 +5,7 @@
     "version": "1.0",
     "content_scripts": [ {
         "matches": ["https://colonist.io/*"],
-        "js": [
-            "content-script.js"]
+        "js": ["content-script.js", "logic.js", "Player.js", "visuals.js"],
+        "type": "module"
     }]
 }
