@@ -34,7 +34,7 @@ function setupMenu() {
 }
 globalThis.setupMenu = setupMenu;
 
-function updateText() {
+function updateText(players) {
     const menu = document.getElementById('resourceTrackerMenu');
     var text = "";
     for (var p of players) {
@@ -51,6 +51,10 @@ function updateText() {
             text += ", stolenBy: " + p.stolenByPlayer + " <img src=\"/dist/images/card_rescardback.svg?v149\" width=\"14.25px\" height=\"20px\"> ";
         }
         text += " <br />";
+    }
+    // Can be delayed, so wait until it is loaded
+    if(!menu) {
+        window.setTimeout(updateText,500);
     }
     menu.innerHTML = text;
 }

@@ -16,6 +16,9 @@ function startScript() {
 globalThis.startScript = startScript;
 
 function createPlayerIfTheyDontExist(username) {
+    const usernamesToExclude = ["No", "Friendly", "Happy"];
+    if(usernamesToExclude.includes(username)) return
+
     for(let player of players){
         if(player.username === username){
             return;
@@ -29,14 +32,35 @@ function findPlayerByUsername(username) {
     return players.find(player => player.username === username);
   }
 
+function getResourcesOrBuildingFromInnerHTML(innerHTML) {
+    // Regular expression to match the `alt` attribute values of the <img> elements for resources
+    const regex = /<img[^>]*?alt="(?!User|bot)(.*?)"[^>]*?>/g;
+    const resources = [];
+    let match;
+    while ((match = regex.exec(innerHTML)) !== null) {
+        resources.push(match[1]);
+    }
+    return resources;
+}
+
+function getResourcesFromTrade(innerHTML) {
+    const resourcePattern = /<img[^>]*?alt="([^"]+)"[^>]*?>/gi;;
+    const resources = [];
+    let match;
+    while ((match = resourcePattern.exec(innerHTML)) !== null) {
+        resources.push(match[1]);
+    }
+    return resources;
+}
+
 const logObserver = async (mutation, observer) => {
     if (mutation[0].type === 'childList') {
         console.log(mutation);
         const innerText = String(mutation[0].addedNodes[0].innerText) // "Viva5523 received starting resources "
         const innerHTML = String(mutation[0].addedNodes[0].innerHTML) // long ass string
 
-        // Starting messages of the game. Ignore
-        if(innerText.includes("Learn how to play in the rulebook") || innerText == ""){
+        // Black span in log. Ignore
+        if( innerText == ""){
             return;
         }
 
@@ -50,31 +74,58 @@ const logObserver = async (mutation, observer) => {
         createPlayerIfTheyDontExist(username);
         const player = findPlayerByUsername(username)
 
-        switch (action) {
-            // Initial placement of settlements/roads at the start of game. Ignore these
-            case "placed a ":
-                return;
-            case "received starting resources ":
-                // Regular expression to match the `alt` attribute values of the <img> elements for resources
-                const regex = /<img[^>]*?alt="(?!User|bot)(.*?)"[^>]*?>/g;
-                
-                const resources = [];
-                let match;
-                while ((match = regex.exec(innerHTML)) !== null) {
-                    console.log(match);
-                    resources.push(match[1]);
-                }
-                
-                for (let resource of resources) {
-                    console.log(resource);
-                    player.updateResource(resource, 1);
-                }
-                break;
+        if (action === "received starting resources " || 
+            action === "got ") {
+            const resources = getResourcesOrBuildingFromInnerHTML(innerHTML);
+            
+            for (let resource of resources) {
+                player.updateResource(resource, 1);
+            }
+
+        } else if (action === "built a ") {
+            const building = getResourcesOrBuildingFromInnerHTML(innerHTML)[0];
+            player.buildBuilding(building);
+
+        } else if (action.includes("traded  for  with")) {
+            const tradingPartner = findPlayerByUsername(innerText.split(" ").slice(-1)[0]);
+            const usedResources = getResourcesFromTrade(innerHTML.split("traded")[1].split("for")[0]);
+            const receivedResources = getResourcesFromTrade(innerHTML.split("for")[1]);
+
+            console.log("Resources used to trade:", usedResources);
+            console.log("Resources received from the trade:", receivedResources);
+            for(let resource of usedResources){
+                player.updateResource(resource, -1);
+                tradingPartner.updateResource(resource, 1);
+            }
+            for(let resource of receivedResources){
+                player.updateResource(resource, 1);
+                tradingPartner.updateResource(resource, -1);
+            }
+
+        } else if (action === "bought "){ // Development card
+            player.buyDevelopmentCard();
+
+        } else if (action.includes("stole"))  { 
+            const stolenFromPlayerUsername = innerText.split(" ").slice(-1)[0];
+            if(username == USERNAME) { //I stole from a player
+                const resource = getResourcesOrBuildingFromInnerHTML(innerHTML)[0];
+                console.log("resource: ", resource)
+                const playerStolenFrom = findPlayerByUsername(stolenFromPlayerUsername);
+                player.stealFromPlayer(playerStolenFrom, resource);
+            } else if(stolenFromPlayerUsername == "You" || stolenFromPlayerUsername == "you") { //I was stolen from
+                const resource = getResourcesOrBuildingFromInnerHTML(innerHTML)[0];
+                console.log("resource: ", resource)
+                const meAsPlayer = findPlayerByUsername(USERNAME);
+                player.stealFromPlayer(meAsPlayer, resource);
+            } else {
+                player.stolenByPlayer += 1;
+                const stolenFromPlayer = findPlayerByUsername(stolenFromPlayer);
+                stolenFromPlayer.stolenFromPlayer += 1;
+            }
+            
         }
         
-        globalThis.updateText();
+        globalThis.updateText(players);
     }
   };
-
-//   waitTillGameIsLoaded();
 
