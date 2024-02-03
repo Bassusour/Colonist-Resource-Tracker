@@ -16,7 +16,7 @@ function startScript() {
 globalThis.startScript = startScript;
 
 function createPlayerIfTheyDontExist(username) {
-    const usernamesToExclude = ["No", "Friendly", "Happy"];
+    const usernamesToExclude = ["No", "Friendly", "Happy", "Bot"];
     if(usernamesToExclude.includes(username)) return
 
     for(let player of players){
@@ -119,13 +119,24 @@ const logObserver = async (mutation, observer) => {
                 player.stealFromPlayer(meAsPlayer, resource);
             } else {
                 player.stolenByPlayer += 1;
-                const stolenFromPlayer = findPlayerByUsername(stolenFromPlayer);
+                const stolenFromPlayer = findPlayerByUsername(stolenFromPlayerUsername);
                 stolenFromPlayer.stolenFromPlayer += 1;
-            }
-            
+            } 
+        } else if (action === "discarded ") {
+            const resources = getResourcesOrBuildingFromInnerHTML(innerHTML);
+            console.log("resources discarded: ", resources);
+            // UNTESTED
+            // for (let resource of resources) {
+            //     player.updateResource(resource, -1);
+            // }
         }
         
         globalThis.updateText(players);
     }
   };
 
+// TODO list
+// - Add monopoly card support
+// - Add road building card support
+// - Add avoiding going in negative resources
+// - Test discarded resources
