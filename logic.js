@@ -136,7 +136,9 @@ const logObserver = async (mutation, observer) => {
   };
 
 // TODO list
+// - Add trade with bank
 // - Add monopoly card support
 // - Add road building card support
 // - Add avoiding going in negative resources
 // - Test discarded resources
+// - Remember state of game if you leave and come back

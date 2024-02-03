@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Colonist Resource Tracker",
-    "description": "Tracks all the resources of your opponents automatically, so you don't have to!",
+    "description": "Tracks all the resources of all players automatically, so you don't have to!",
     "version": "1.0",
     "content_scripts": [ {
         "matches": ["https://colonist.io/*"],
