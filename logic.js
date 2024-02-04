@@ -16,7 +16,7 @@ function startScript() {
 globalThis.startScript = startScript;
 
 function createPlayerIfTheyDontExist(username) {
-    const usernamesToExclude = ["No", "Friendly", "Happy", "Bot", ""];
+    const usernamesToExclude = ["No", "Friendly", "Happy", "Bot", "", "Game"];
     if(usernamesToExclude.includes(username)) return
 
     for(let player of players){
@@ -142,17 +142,21 @@ const logObserver = async (mutation, observer) => {
             for(let resource of receivedResources){
                 player.updateResource(resource, 1);
             }
-        } else if(action.includes("won the game!")) {
+        } else if(action.includes("took from bank")) { // Year of plenty card
+            const receivedResources = getResourcesOrBuildingFromInnerHTML(innerHTML);
+            for(let resource of receivedResources){
+                player.updateResource(resource, 1);
+            }
+        }
+        else if(action.includes("won the game!")) {
             console.log("Game over");
             observer.disconnect();
             return;
         }
-        
         globalThis.updateText(players);
     }
   };
 
 // TODO list
-// - Add road building card support
 // - Remember state of game if you leave and come back
 // - Get username of user

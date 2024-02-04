@@ -34,9 +34,14 @@ function setupMenu() {
 }
 globalThis.setupMenu = setupMenu;
 
-function updateText(players) {
+async function updateText(players) {
+    await waitForDOMReady();
     if(!players) return;
     const menu = document.getElementById('resourceTrackerMenu');
+    if(!menu) {
+        console.log("Menu element not found!");
+        return; // Exit the function if menu is null
+    }
     var text = "";
     for (var p of players) {
         text += p.username + ": " + 
@@ -54,9 +59,9 @@ function updateText(players) {
         text += " <br />";
     }
     // Can be delayed, so wait until it is loaded
-    if(!menu) {
-        window.setTimeout(updateText,500);
-    }
+    // if(!menu) {
+    //     window.setTimeout(updateText,500);
+    // }
     menu.innerHTML = text;
 }
 globalThis.updateText = updateText;
@@ -68,4 +73,14 @@ function displayMenu() {
     } else {
         menu.style.display = "none";
     }
+}
+
+function waitForDOMReady() {
+    return new Promise(resolve => {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', resolve);
+        } else {
+            resolve();
+        }
+    });
 }
