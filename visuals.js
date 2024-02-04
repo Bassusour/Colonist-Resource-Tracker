@@ -1,25 +1,33 @@
 'use strict';
 
 function setupMenu() {
-    var btnDiv = document.getElementById('help_buttons_section');
+    var helpButtonsSection = document.getElementById('help_buttons_section');
     // Can be delayed, so wait until it is loaded
-    if(!btnDiv) {
+    if(!helpButtonsSection) {
         window.setTimeout(setupMenu,500);
         return;
     }
     var menuDiv = document.createElement('div');
-    menuDiv.innerHTML = 'Nothing has happened yet. ';
+    menuDiv.innerHTML = 'Nothing has happened yet.';
+
+    var btnDiv = document.createElement('div');
+    btnDiv.id = 'resourceTrackerMenuButton';
+    var helpButtonContentsDiv = document.createElement('div');
+    helpButtonContentsDiv.className = 'help-button-contents';
+    btnDiv.appendChild(helpButtonContentsDiv);
+
     var btn = document.createElement('button');
+    btnDiv.appendChild(btn);
 
     document.body.appendChild(menuDiv);
-    btnDiv.appendChild(btn);
+    helpButtonsSection.appendChild(btnDiv);
 
     menuDiv.style.zIndex = 100;
     menuDiv.id = 'resourceTrackerMenu';
     menuDiv.style.position = 'absolute';
     menuDiv.style.top = '25%';
     menuDiv.style.left = '10%';
-    menuDiv.style.backgroundImage = 'linear-gradient(to bottom,#fcfaf5,#e2d7c4)';
+    // menuDiv.style.backgroundImage = 'linear-gradient(to bottom,#fcfaf5,#e2d7c4)';
     menuDiv.style.padding = '10px';
     menuDiv.style.color = 'black';
     menuDiv.style.zIndex = 100;
