@@ -35,6 +35,7 @@ function setupMenu() {
 globalThis.setupMenu = setupMenu;
 
 function updateText(players) {
+    if(!players) return;
     const menu = document.getElementById('resourceTrackerMenu');
     var text = "";
     for (var p of players) {

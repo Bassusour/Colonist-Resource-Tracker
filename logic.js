@@ -16,7 +16,7 @@ function startScript() {
 globalThis.startScript = startScript;
 
 function createPlayerIfTheyDontExist(username) {
-    const usernamesToExclude = ["No", "Friendly", "Happy", "Bot"];
+    const usernamesToExclude = ["No", "Friendly", "Happy", "Bot", ""];
     if(usernamesToExclude.includes(username)) return
 
     for(let player of players){
@@ -43,16 +43,6 @@ function getResourcesOrBuildingFromInnerHTML(innerHTML) {
     return resources;
 }
 
-function getResourcesFromTrade(innerHTML) {
-    const resourcePattern = /<img[^>]*?alt="([^"]+)"[^>]*?>/gi;;
-    const resources = [];
-    let match;
-    while ((match = resourcePattern.exec(innerHTML)) !== null) {
-        resources.push(match[1]);
-    }
-    return resources;
-}
-
 const logObserver = async (mutation, observer) => {
     if (mutation[0].type === 'childList') {
         console.log(mutation);
@@ -60,7 +50,7 @@ const logObserver = async (mutation, observer) => {
         const innerHTML = String(mutation[0].addedNodes[0].innerHTML) // long ass string
 
         // Black span in log. Ignore
-        if( innerText == ""){
+        if(innerText == ""){
             return;
         }
 
@@ -81,18 +71,17 @@ const logObserver = async (mutation, observer) => {
             for (let resource of resources) {
                 player.updateResource(resource, 1);
             }
-
-        } else if (action === "built a ") {
+        } else if (action.includes("built a")) {
             const building = getResourcesOrBuildingFromInnerHTML(innerHTML)[0];
             player.buildBuilding(building);
-
         } else if (action.includes("traded  for  with")) {
             const tradingPartner = findPlayerByUsername(innerText.split(" ").slice(-1)[0]);
-            const usedResources = getResourcesFromTrade(innerHTML.split("traded")[1].split("for")[0]);
-            const receivedResources = getResourcesFromTrade(innerHTML.split("for")[1]);
+            const usedResources = getResourcesOrBuildingFromInnerHTML(innerHTML.split("traded")[1].split("for")[0]);
+            const receivedResources = getResourcesOrBuildingFromInnerHTML(innerHTML.split("for")[1]);
 
-            console.log("Resources used to trade:", usedResources);
-            console.log("Resources received from the trade:", receivedResources);
+            console.log("usedResources2: " + getResourcesOrBuildingFromInnerHTML(innerHTML.split("for")[0]))
+            console.log("receivedResources2: " + getResourcesOrBuildingFromInnerHTML(innerHTML.split("for")[1]))
+
             for(let resource of usedResources){
                 player.updateResource(resource, -1);
                 tradingPartner.updateResource(resource, 1);
@@ -101,20 +90,16 @@ const logObserver = async (mutation, observer) => {
                 player.updateResource(resource, 1);
                 tradingPartner.updateResource(resource, -1);
             }
-
         } else if (action === "bought "){ // Development card
             player.buyDevelopmentCard();
-
-        } else if (action.includes("stole"))  { 
+        } else if (action.includes("stole") && action.includes("from")) { 
             const stolenFromPlayerUsername = innerText.split(" ").slice(-1)[0];
             if(username == USERNAME) { //I stole from a player
                 const resource = getResourcesOrBuildingFromInnerHTML(innerHTML)[0];
-                console.log("resource: ", resource)
                 const playerStolenFrom = findPlayerByUsername(stolenFromPlayerUsername);
                 player.stealFromPlayer(playerStolenFrom, resource);
             } else if(stolenFromPlayerUsername == "You" || stolenFromPlayerUsername == "you") { //I was stolen from
                 const resource = getResourcesOrBuildingFromInnerHTML(innerHTML)[0];
-                console.log("resource: ", resource)
                 const meAsPlayer = findPlayerByUsername(USERNAME);
                 player.stealFromPlayer(meAsPlayer, resource);
             } else {
@@ -122,13 +107,45 @@ const logObserver = async (mutation, observer) => {
                 const stolenFromPlayer = findPlayerByUsername(stolenFromPlayerUsername);
                 stolenFromPlayer.stolenFromPlayer += 1;
             } 
-        } else if (action === "discarded ") {
+        } else if(action.includes("stole")) { // Monopoly card
+            const resource = getResourcesOrBuildingFromInnerHTML(innerHTML)[0];
+            const amount = innerText.split(" ")[2];
+            let calculatedAmount = 0;
+            for(let p of players){
+                if(p.username != username){
+                    const amountOfResourceForPlayer = p[resource];
+                    calculatedAmount += amountOfResourceForPlayer;
+                    player.updateResource(resource, amountOfResourceForPlayer);
+                    p.updateResource(resource, -amountOfResourceForPlayer);
+                }
+            }
+            if(calculatedAmount != amount){
+                console.log("Error: calculated amount: " + calculatedAmount + " does not match amount: " + amount);
+                const diff = amount - calculatedAmount;
+                player.updateResource(resource, diff);
+                // TODO: Image analysis
+            }
+        }
+        
+        else if (action === "discarded ") {
             const resources = getResourcesOrBuildingFromInnerHTML(innerHTML);
             console.log("resources discarded: ", resources);
-            // UNTESTED
-            // for (let resource of resources) {
-            //     player.updateResource(resource, -1);
-            // }
+            for (let resource of resources) {
+                player.updateResource(resource, -1);
+            }
+        } else if(action.includes("gave bank")) {
+            const usedResources = getResourcesOrBuildingFromInnerHTML(innerHTML.split("and took")[0]);
+            const receivedResources = getResourcesOrBuildingFromInnerHTML(innerHTML.split("and took")[1]);
+            for(let resource of usedResources){
+                player.updateResource(resource, -1);
+            }
+            for(let resource of receivedResources){
+                player.updateResource(resource, 1);
+            }
+        } else if(action.includes("won the game!")) {
+            console.log("Game over");
+            observer.disconnect();
+            return;
         }
         
         globalThis.updateText(players);
@@ -136,9 +153,6 @@ const logObserver = async (mutation, observer) => {
   };
 
 // TODO list
-// - Add trade with bank
-// - Add monopoly card support
 // - Add road building card support
-// - Add avoiding going in negative resources
-// - Test discarded resources
 // - Remember state of game if you leave and come back
+// - Get username of user

@@ -14,39 +14,44 @@ class Player {
       console.log("updating resource: " + resource + " by " + amount + " for " + this.username)
       this[resource] += amount;
       if (this[resource] < 0) {
-          // TODO
+        console.log("avoiding negative resource: " + resource + " for " + this.username)
+        const diff = Math.abs(this[resource]);
+        if(this.stolenByPlayer > 0 && this.stolenByPlayer >= diff) {
+            this.stolenByPlayer -= diff;
+        } else {
+            this[resource] = 0;
+            this.stolenByPlayer = 0;
+        }
       }
   }
 
   buildBuilding(building) {
-      switch (building) {
-          case "settlement":
-              this.lumber -= 1;
-              this.brick -= 1;
-              this.wool -= 1;
-              this.grain -= 1;
-              break;
-          case "city":
-              this.grain -= 2;
-              this.ore -= 3;
-              break;
-          case "road":
-              this.lumber -= 1;
-              this.brick -= 1;
-              break;
-          default:
-              console.log("building not recognized: " + building);
-      }
-
-      if (this.lumber < 0 || this.brick < 0 || this.wool < 0 || this.grain < 0 || this.ore < 0) {
-          // TODO
-      }
+    console.log("building: " + building + " for " + this.username)
+    switch (building) {
+        case "settlement":
+            this.updateResource("lumber", -1);
+            this.updateResource("brick", -1);
+            this.updateResource("wool", -1);
+            this.updateResource("grain", -1);
+            break;
+        case "city":
+            this.updateResource("grain", -2);
+            this.updateResource("ore", -3);
+            break;
+        case "road":
+            this.updateResource("lumber", -1);
+            this.updateResource("brick", -1);
+            break;
+        default:
+            console.log("building not recognized: " + building);
+    }
   }
 
   buyDevelopmentCard() {
-      this.lumber -= 1;
-      this.wool -= 1;
-      this.grain -= 1;
+    console.log("buying development card for " + this.username)
+    this.updateResource("ore", -1);
+    this.updateResource("wool", -1);
+    this.updateResource("grain", -1);
   }
 
   stealFromPlayer(player, resource) {
