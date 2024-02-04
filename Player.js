@@ -7,8 +7,8 @@ class Player {
       this.wool = 0;
       this.grain = 0;
       this.ore = 0;
-      this.stolenFromPlayer = 0;    // <= 0
-      this.stolenByPlayer = 0;      // >= 0
+      this.stolenFromPlayer = 0;
+      this.stolenByPlayer = 0;
       this.username = username;
   }
 

@@ -15,6 +15,5 @@ if (usernameAvaliable()) {
       }
     });
   
-    // Start observing changes to the DOM
     observer.observe(document.body, { childList: true, subtree: true });
   }

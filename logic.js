@@ -157,10 +157,8 @@ const logObserver = async (mutation, observer) => {
   };
 
   function loadGameState() {
-    // Retrieve the game state from storage
     const gameStateJSON = localStorage.getItem('gameState');
     if (gameStateJSON) {
-        // Parse the JSON data to get the game state object
         const gameState = JSON.parse(gameStateJSON);
         if(gameState.players){
             players = gameState.players;
@@ -172,4 +170,3 @@ const logObserver = async (mutation, observer) => {
 
 // TODO list
 // - Image analysis for monopoly card
-// - Placement of menu

@@ -27,7 +27,7 @@ function setupMenu() {
     menuDiv.style.position = 'absolute';
     menuDiv.style.top = '25%';
     menuDiv.style.left = '10%';
-    // menuDiv.style.backgroundImage = 'linear-gradient(to bottom,#fcfaf5,#e2d7c4)';
+    menuDiv.style.backgroundImage = 'linear-gradient(to bottom,#fcfaf5,#e2d7c4)';
     menuDiv.style.padding = '10px';
     menuDiv.style.color = 'black';
     menuDiv.style.zIndex = 100;
@@ -69,10 +69,6 @@ async function updateText(players) {
         }
         text += " <br />";
     }
-    // Can be delayed, so wait until it is loaded
-    // if(!menu) {
-    //     window.setTimeout(updateText,500);
-    // }
     menu.innerHTML = text;
 }
 globalThis.updateText = updateText;
