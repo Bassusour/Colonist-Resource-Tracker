@@ -1,11 +1,10 @@
 'use strict';
 
-const USERNAME = "Viva5523";
-
 var players = [];
 
 function startScript() {
     console.log("tracking started");
+    loadGameState();
     var logDiv = document.getElementById('game-log-text');
     var config = {childList: true};
     const observer = new MutationObserver(logObserver);
@@ -46,8 +45,8 @@ function getResourcesOrBuildingFromInnerHTML(innerHTML) {
 const logObserver = async (mutation, observer) => {
     if (mutation[0].type === 'childList') {
         console.log(mutation);
-        const innerText = String(mutation[0].addedNodes[0].innerText) // "Viva5523 received starting resources "
-        const innerHTML = String(mutation[0].addedNodes[0].innerHTML) // long ass string
+        const innerText = String(mutation[0].addedNodes[0].innerText)
+        const innerHTML = String(mutation[0].addedNodes[0].innerHTML)
 
         // Black span in log. Ignore
         if(innerText == ""){
@@ -58,7 +57,7 @@ const logObserver = async (mutation, observer) => {
         var action = innerText.substring(innerText.indexOf(" ") + 1);
 
         if(username == "You" || username == "you"){
-            username = USERNAME
+            username = globalThis.USERNAME
         }
 
         createPlayerIfTheyDontExist(username);
@@ -94,13 +93,13 @@ const logObserver = async (mutation, observer) => {
             player.buyDevelopmentCard();
         } else if (action.includes("stole") && action.includes("from")) { 
             const stolenFromPlayerUsername = innerText.split(" ").slice(-1)[0];
-            if(username == USERNAME) { //I stole from a player
+            if(username == globalThis.USERNAME) { //I stole from a player
                 const resource = getResourcesOrBuildingFromInnerHTML(innerHTML)[0];
                 const playerStolenFrom = findPlayerByUsername(stolenFromPlayerUsername);
                 player.stealFromPlayer(playerStolenFrom, resource);
             } else if(stolenFromPlayerUsername == "You" || stolenFromPlayerUsername == "you") { //I was stolen from
                 const resource = getResourcesOrBuildingFromInnerHTML(innerHTML)[0];
-                const meAsPlayer = findPlayerByUsername(USERNAME);
+                const meAsPlayer = findPlayerByUsername(globalThis.USERNAME);
                 player.stealFromPlayer(meAsPlayer, resource);
             } else {
                 player.stolenByPlayer += 1;
@@ -157,6 +156,20 @@ const logObserver = async (mutation, observer) => {
     }
   };
 
+  function loadGameState() {
+    // Retrieve the game state from storage
+    const gameStateJSON = localStorage.getItem('gameState');
+    if (gameStateJSON) {
+        // Parse the JSON data to get the game state object
+        const gameState = JSON.parse(gameStateJSON);
+        if(gameState.players){
+            players = gameState.players;
+        }
+        console.log('Game state loaded:', gameState);
+        globalThis.updateText(players);
+    }
+}
+
 // TODO list
-// - Remember state of game if you leave and come back
-// - Get username of user
+// - Image analysis for monopoly card
+// - Placement of menu

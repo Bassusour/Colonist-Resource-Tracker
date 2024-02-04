@@ -1,3 +1,5 @@
+'use strict';
+
 function setupMenu() {
     var btnDiv = document.getElementById('help_buttons_section');
     // Can be delayed, so wait until it is loaded
@@ -35,12 +37,13 @@ function setupMenu() {
 globalThis.setupMenu = setupMenu;
 
 async function updateText(players) {
-    await waitForDOMReady();
     if(!players) return;
     const menu = document.getElementById('resourceTrackerMenu');
+
+    // The menu is not created instantly, so wait until it is loaded
     if(!menu) {
         console.log("Menu element not found!");
-        return; // Exit the function if menu is null
+        return; 
     }
     var text = "";
     for (var p of players) {
@@ -73,14 +76,4 @@ function displayMenu() {
     } else {
         menu.style.display = "none";
     }
-}
-
-function waitForDOMReady() {
-    return new Promise(resolve => {
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', resolve);
-        } else {
-            resolve();
-        }
-    });
 }

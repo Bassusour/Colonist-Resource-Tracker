@@ -1,3 +1,5 @@
+'use strict';
+
 class Player {
   constructor(username) {
       this.lumber = 0;
@@ -19,9 +21,9 @@ class Player {
         if(this.stolenByPlayer > 0 && this.stolenByPlayer >= diff) {
             this.stolenByPlayer -= diff;
         } else {
-            this[resource] = 0;
             this.stolenByPlayer = 0;
         }
+        this[resource] = 0;
       }
   }
 
