@@ -4,7 +4,7 @@ var players = [];
 
 function startScript() {
     console.log("tracking started");
-    loadGameState();
+    // loadGameState();
     var logDiv = document.getElementById('game-log-text');
     var config = {childList: true};
     const observer = new MutationObserver(logObserver);
@@ -68,6 +68,7 @@ const logObserver = async (mutation, observer) => {
             const resources = getResourcesOrBuildingFromInnerHTML(innerHTML);
             
             for (let resource of resources) {
+                console.log(player);
                 player.updateResource(resource, 1);
             }
         } else if (action.includes("built a")) {
@@ -122,7 +123,6 @@ const logObserver = async (mutation, observer) => {
                 console.log("Error: calculated amount: " + calculatedAmount + " does not match amount: " + amount);
                 const diff = amount - calculatedAmount;
                 player.updateResource(resource, diff);
-                // TODO: Image analysis
             }
         }
         
@@ -149,6 +149,7 @@ const logObserver = async (mutation, observer) => {
         }
         else if(action.includes("won the game!")) {
             console.log("Game over");
+
             observer.disconnect();
             return;
         }
@@ -170,3 +171,6 @@ const logObserver = async (mutation, observer) => {
 
 // TODO list
 // - Image analysis for monopoly card
+// - Don't load gamestate if the game is over or user starts new game
+// - Move menu below the button
+// - Find cool logo for the button
