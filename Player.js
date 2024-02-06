@@ -18,7 +18,7 @@ class Player {
       if (this[resource] < 0) {
         console.log("avoiding negative resource: " + resource + " for " + this.username)
         const diff = Math.abs(this[resource]);
-        if(this.stolenByPlayer > 0 && this.stolenByPlayer >= diff) {
+        if(this.stolenByPlayer >= diff) {
             this.stolenByPlayer -= diff;
         } else {
             this.stolenByPlayer = 0;

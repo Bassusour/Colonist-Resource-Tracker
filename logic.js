@@ -110,7 +110,7 @@ const logObserver = async (mutation, observer) => {
         } else if(action.includes("stole")) { // Monopoly card
             const resource = getResourcesOrBuildingFromInnerHTML(innerHTML)[0];
             const amount = innerText.split(" ")[2];
-            let calculatedAmount = 0;
+            let calculatedAmount = 0; // calculatedAmount <= amount
             for(let p of players){
                 if(p.username != username){
                     const amountOfResourceForPlayer = p[resource];
@@ -120,9 +120,15 @@ const logObserver = async (mutation, observer) => {
                 }
             }
             if(calculatedAmount != amount){
-                console.log("Error: calculated amount: " + calculatedAmount + " does not match amount: " + amount);
-                const diff = amount - calculatedAmount;
-                player.updateResource(resource, diff);
+                const diff = Math.abs(amount - calculatedAmount);
+                // If only one player has unknown resources, we can assume that the difference is from that player
+                if(players.filter(player => player.stolenFromPlayer >= 1).length === 1){
+                    var playerWithUnknownResources = players.filter(player => player.stolenFromPlayer >= 1)[0];
+                    playerWithUnknownResources.updateResource(resource, -diff);
+                } else {
+                    console.log("Error: calculated amount: " + calculatedAmount + " does not match amount: " + amount);
+                    player.updateResource(resource, diff);
+                }
             }
         }
         
