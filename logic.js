@@ -101,8 +101,6 @@ const logObserver = (mutation, observer) => {
             } else {
                 const stolenFromPlayer = findPlayerByUsername(stolenFromPlayerUsername);
                 player.stealUnknownResourceFromPlayer(stolenFromPlayer);
-                player.stolenByPlayer += 1;
-                stolenFromPlayer.stolenFromPlayer += 1;
             } 
         } else if(action.includes("stole")) { // Monopoly card
             const resource = getResourcesOrBuildingFromInnerHTML(innerHTML)[0];
