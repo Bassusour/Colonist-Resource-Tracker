@@ -26,6 +26,7 @@ class Player {
         }
         this[resource] = 0;
       }
+      this.resetIfRobbedOfAllResources();
   }
 
   buildBuilding(building) {
@@ -66,17 +67,21 @@ class Player {
     this.stolenByPlayer += 1;
     playerStolenFrom.stolenFromPlayer += 1;
 
-    if(playerStolenFrom.stolenFromPlayer == playerStolenFrom.sumOfResources()) {
-        console.log("player " + playerStolenFrom.username + " has been robbed of all their resources :(")
-        playerStolenFrom.stolenFromPlayer = 0;
-        playerStolenFrom.stolenByPlayer = 0;
-        playerStolenFrom.brick = 0;
-        playerStolenFrom.lumber = 0;
-        playerStolenFrom.wool = 0;
-        playerStolenFrom.grain = 0;
-        playerStolenFrom.ore = 0;
-      }
+    playerStolenFrom.resetIfRobbedOfAllResources();
     }
+
+  resetIfRobbedOfAllResources() {
+    if (this.stolenFromPlayer == this.sumOfResources()) {
+      console.log("player " + this.username + " has been robbed of all their resources :(");
+      this.stolenFromPlayer = 0;
+      this.stolenByPlayer = 0;
+      this.brick = 0;
+      this.lumber = 0;
+      this.wool = 0;
+      this.grain = 0;
+      this.ore = 0;
+    }
+  }
 
     sumOfResources() {
         return this.brick + this.lumber + this.wool + this.grain + this.ore + this.stolenByPlayer;
