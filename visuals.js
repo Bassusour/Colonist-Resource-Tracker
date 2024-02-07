@@ -10,47 +10,51 @@ function setupMenu() {
     var menuDiv = document.createElement('div');
     menuDiv.innerHTML = 'Nothing has happened yet.';
 
-    var btnDiv = document.createElement('div');
-    btnDiv.id = 'resourceTrackerMenuButton';
+    var resourceTrackerDiv = document.createElement('div');
+    resourceTrackerDiv.id = 'resourceTrackerMenuButton';
     var helpButtonContentsDiv = document.createElement('div');
     helpButtonContentsDiv.className = 'help-button-contents';
-    btnDiv.appendChild(helpButtonContentsDiv);
+    resourceTrackerDiv.appendChild(helpButtonContentsDiv);
 
     var btn = document.createElement('button');
-    btnDiv.appendChild(btn);
+    resourceTrackerDiv.appendChild(btn);
 
-    document.body.appendChild(menuDiv);
-    helpButtonsSection.appendChild(btnDiv);
-
-    menuDiv.style.zIndex = 100;
-    menuDiv.id = 'resourceTrackerMenu';
-    menuDiv.style.position = 'absolute';
-    menuDiv.style.top = '25%';
-    menuDiv.style.left = '10%';
-    menuDiv.style.backgroundImage = 'linear-gradient(to bottom,#fcfaf5,#e2d7c4)';
-    menuDiv.style.padding = '10px';
-    menuDiv.style.color = 'black';
-    menuDiv.style.zIndex = 100;
-    menuDiv.style.display = 'none';
+    resourceTrackerDiv.appendChild(menuDiv);
+    helpButtonsSection.appendChild(resourceTrackerDiv);
 
     btn.type = 'button';
-    btn.style.position = 'absolute';
+    btn.style.position = 'relative';
     btn.style.width = '51.876px';
     btn.style.height = '51.876px';
     btn.style.left = '9%';
     btn.style.background = "url('/dist/images/icon_settings.svg?v149')";
     btn.style.backgroundSize = 'cover';
     btn.onclick = function () { displayMenu(); };
+
+    menuDiv.style.zIndex = 100;
+    menuDiv.id = 'resourceTrackerMenu';
+    menuDiv.style.position = 'block';
+    menuDiv.style.position = 'absolute';
+    menuDiv.style.padding = '10px';
+    menuDiv.style.left = '100%';
+    menuDiv.style.whiteSpace = 'nowrap'; 
+    menuDiv.style.backgroundImage = 'linear-gradient(to bottom,#fcfaf5,#e2d7c4)';
+    menuDiv.style.padding = '10px';
+    menuDiv.style.color = 'black';
+    menuDiv.style.zIndex = 100;
+    menuDiv.style.display = 'none';
+
+    
 }
 globalThis.setupMenu = setupMenu;
 
-async function updateText(players) {
+function updateText(players) {
     if(!players) return;
     const menu = document.getElementById('resourceTrackerMenu');
 
     // The menu is not created instantly, so wait until it is loaded
     if(!menu) {
-        console.log("Menu element not found!");
+        console.log("Menu element not created yet");
         return; 
     }
     var text = "";
