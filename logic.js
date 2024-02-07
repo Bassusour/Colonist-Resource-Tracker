@@ -42,9 +42,8 @@ function getResourcesOrBuildingFromInnerHTML(innerHTML) {
     return resources;
 }
 
-const logObserver = async (mutation, observer) => {
+const logObserver = (mutation, observer) => {
     if (mutation[0].type === 'childList') {
-        console.log(mutation);
         const innerText = String(mutation[0].addedNodes[0].innerText)
         const innerHTML = String(mutation[0].addedNodes[0].innerHTML)
 
@@ -78,9 +77,6 @@ const logObserver = async (mutation, observer) => {
             const usedResources = getResourcesOrBuildingFromInnerHTML(innerHTML.split("traded")[1].split("for")[0]);
             const receivedResources = getResourcesOrBuildingFromInnerHTML(innerHTML.split("for")[1]);
 
-            console.log("usedResources2: " + getResourcesOrBuildingFromInnerHTML(innerHTML.split("for")[0]))
-            console.log("receivedResources2: " + getResourcesOrBuildingFromInnerHTML(innerHTML.split("for")[1]))
-
             for(let resource of usedResources){
                 player.updateResource(resource, -1);
                 tradingPartner.updateResource(resource, 1);
@@ -93,6 +89,7 @@ const logObserver = async (mutation, observer) => {
             player.buyDevelopmentCard();
         } else if (action.includes("stole") && action.includes("from")) { 
             const stolenFromPlayerUsername = innerText.split(" ").slice(-1)[0];
+            console.log(player.username + " stole from " + stolenFromPlayerUsername)
             if(username == globalThis.USERNAME) { //I stole from a player
                 const resource = getResourcesOrBuildingFromInnerHTML(innerHTML)[0];
                 const playerStolenFrom = findPlayerByUsername(stolenFromPlayerUsername);
@@ -102,8 +99,9 @@ const logObserver = async (mutation, observer) => {
                 const meAsPlayer = findPlayerByUsername(globalThis.USERNAME);
                 player.stealFromPlayer(meAsPlayer, resource);
             } else {
-                player.stolenByPlayer += 1;
                 const stolenFromPlayer = findPlayerByUsername(stolenFromPlayerUsername);
+                player.stealUnknownResourceFromPlayer(stolenFromPlayer);
+                player.stolenByPlayer += 1;
                 stolenFromPlayer.stolenFromPlayer += 1;
             } 
         } else if(action.includes("stole")) { // Monopoly card
@@ -157,7 +155,6 @@ const logObserver = async (mutation, observer) => {
             console.log("Game over");
             localStorage.removeItem('gameState');
             players = [];
-            console.log("Game state removed because the game is over");
             observer.disconnect();
             return;
         }
@@ -185,6 +182,4 @@ const logObserver = async (mutation, observer) => {
 
 // TODO list
 // - Image analysis for monopoly card
-// - Don't load gamestate if the game is over or user starts new game
-// - Move menu below the button
 // - Find cool logo for the button

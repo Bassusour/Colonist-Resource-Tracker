@@ -15,6 +15,7 @@ class Player {
   updateResource(resource, amount) {
       console.log("updating resource: " + resource + " by " + amount + " for " + this.username)
       this[resource] += amount;
+
       if (this[resource] < 0) {
         console.log("avoiding negative resource: " + resource + " for " + this.username)
         const diff = Math.abs(this[resource]);
@@ -56,9 +57,29 @@ class Player {
     this.updateResource("grain", -1);
   }
 
-  stealFromPlayer(player, resource) {
-      player.updateResource(resource, -1);
+  stealFromPlayer(stolenFromPlayer, resource) {
+      stolenFromPlayer.updateResource(resource, -1);
       this.updateResource(resource, 1);
+  }
+
+  stealUnknownResourceFromPlayer(playerStolenFrom) {
+    this.stolenByPlayer += 1;
+    playerStolenFrom.stolenFromPlayer += 1;
+
+    if(playerStolenFrom.stolenFromPlayer == playerStolenFrom.sumOfResources()) {
+        console.log("player " + playerStolenFrom.username + " has been robbed of all their resources :(")
+        playerStolenFrom.stolenFromPlayer = 0;
+        playerStolenFrom.stolenByPlayer = 0;
+        playerStolenFrom.brick = 0;
+        playerStolenFrom.lumber = 0;
+        playerStolenFrom.wool = 0;
+        playerStolenFrom.grain = 0;
+        playerStolenFrom.ore = 0;
+      }
+    }
+
+    sumOfResources() {
+        return this.brick + this.lumber + this.wool + this.grain + this.ore + this.stolenByPlayer;
   }
 }
 globalThis.Player = Player;
