@@ -2,9 +2,11 @@
 
 function saveGameState() {
     const gameState = {
+        url: window.location.href,
         players: globalThis.players
     };
-    localStorage.setItem('gameState', JSON.stringify(gameState));
+    window.localStorage.setItem('gameState', JSON.stringify(gameState));
+    // localStorage.setItem('gameState', JSON.stringify(gameState));
 }
 
 // Check if the user is leaving a match in progress

@@ -4,7 +4,7 @@ var players = [];
 
 function startScript() {
     console.log("tracking started");
-    // loadGameState();
+    loadGameState();
     var logDiv = document.getElementById('game-log-text');
     var config = {childList: true};
     const observer = new MutationObserver(logObserver);
@@ -68,7 +68,6 @@ const logObserver = async (mutation, observer) => {
             const resources = getResourcesOrBuildingFromInnerHTML(innerHTML);
             
             for (let resource of resources) {
-                console.log(player);
                 player.updateResource(resource, 1);
             }
         } else if (action.includes("built a")) {
@@ -127,6 +126,7 @@ const logObserver = async (mutation, observer) => {
                     playerWithUnknownResources.updateResource(resource, -diff);
                 } else {
                     console.log("Error: calculated amount: " + calculatedAmount + " does not match amount: " + amount);
+                    console.log("One or more players will show wrong resources with a total amount of: " + diff + " combined");
                     player.updateResource(resource, diff);
                 }
             }
@@ -155,7 +155,9 @@ const logObserver = async (mutation, observer) => {
         }
         else if(action.includes("won the game!")) {
             console.log("Game over");
-
+            localStorage.removeItem('gameState');
+            players = [];
+            console.log("Game state removed because the game is over");
             observer.disconnect();
             return;
         }
@@ -167,11 +169,17 @@ const logObserver = async (mutation, observer) => {
     const gameStateJSON = localStorage.getItem('gameState');
     if (gameStateJSON) {
         const gameState = JSON.parse(gameStateJSON);
-        if(gameState.players){
+        if(gameState.players && gameState.url === window.location.href){
             players = gameState.players;
+            players.forEach(player => Object.setPrototypeOf(player, Player.prototype));
+            globalThis.updateText(players);
+            console.log('Game state loaded');
+        } else {
+            // The stored gamestate is from a different game
+            localStorage.removeItem('gameState');
+            console.log('Game state removed, because it was from a different game');
         }
-        console.log('Game state loaded:', gameState);
-        globalThis.updateText(players);
+        
     }
 }
 
