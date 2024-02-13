@@ -27,8 +27,14 @@ function setupMenu() {
     btn.style.width = '51.876px';
     btn.style.height = '51.876px';
     btn.style.left = '9%';
-    btn.style.background = "url('/dist/images/icon_settings.svg?v149')";
-    btn.style.backgroundSize = 'cover';
+    var imageUrl = chrome.runtime.getURL('images/gear.png');
+    btn.style.backgroundImage = `url(${imageUrl})`;
+    console.log(imageUrl)
+    // console.log(`chrome-extension://${chrome.runtime.id}/images/gear.png`)
+    // btn.style.backgroundColor = 'transparent';
+    btn.style.backgroundSize = 'contain';
+    btn.style.backgroundRepeat = 'no-repeat';
+    // btn.style.border = 'none';
     btn.onclick = function () { displayMenu(); };
 
     menuDiv.style.zIndex = 100;
@@ -82,6 +88,13 @@ function displayMenu() {
     if(menu.style.display === "none") {
         menu.style.display = "block";
     } else {
+        menu.style.display = "none";
+    }
+}
+
+function correctNumberOfResourcesMenu() {
+    const menu = document.getElementById('resourceTrackerMenu');
+    if(menu.style.display === "block") {
         menu.style.display = "none";
     }
 }

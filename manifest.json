@@ -3,9 +3,20 @@
     "name": "Colonist Resource Tracker",
     "description": "Tracks all the resources of all players automatically, so you don't have to!",
     "version": "1.0",
+    "permissions": [
+        "activeTab",
+        "storage",
+        "http://*/*",
+        "notifications"
+      ],
     "content_scripts": [ {
         "matches": ["https://colonist.io/*"],
         "js": ["content-script.js", "logic.js", "player.js", "visuals.js", "getUsername.js", "saveGameState.js"],
         "type": "module"
-    }]
+    }],
+    "icons": {
+        "16": "images/icon16.png",
+        "48": "images/icon48.png",
+        "128": "images/icon128.png"
+      }
 }

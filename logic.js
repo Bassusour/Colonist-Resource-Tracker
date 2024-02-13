@@ -180,4 +180,4 @@ const logObserver = (mutation, observer) => {
 
 // TODO list
 // - Image analysis for monopoly card
-// - Find cool logo for the button
+// - Possibility to remove local storage
