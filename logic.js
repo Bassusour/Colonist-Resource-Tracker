@@ -43,6 +43,15 @@ function getResourcesOrBuildingFromInnerHTML(innerHTML) {
     return resources;
 }
 
+function getResourcesFromHTML(innerHTML) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(innerHTML, "text/html");
+    const imgs = doc.querySelectorAll('img.lobbyChatTextIcon');
+
+    const resources = Array.from(imgs).map(img => img.alt);
+    return resources;
+}
+
 const logObserver = (mutations, observer) => {
     // console.log(mutations)
     for (const mutation of mutations) {
@@ -54,7 +63,7 @@ const logObserver = (mutations, observer) => {
             continue;
         }
         const index = node.dataset.index;
-        if (seenLogIndexes.has(index)) {
+        if (seenLogIndexes.has(index) || node.innerText == undefined || node.innerText == "" || !node.innerText) {
             continue;
         }
 
@@ -62,7 +71,51 @@ const logObserver = (mutations, observer) => {
         console.log("InnerHTML: " + node.innerHTML)
         seenLogIndexes.add(index);
 
+        const username = node.innerText.split(' ')[0];
+        const action = node.innerText.split(' ')[1];
 
+        const ignoreActions = ['has', 'wants', 'rolled', 'moved', 'used']
+        if(action in ignoreActions) {
+            continue;
+        }
+
+        if(username == "You" || username == "you"){
+            username = globalThis.USERNAME
+        }
+
+        createPlayerIfTheyDontExist(username);
+        const player = findPlayerByUsername(username)
+
+        switch(action) {
+            case "received":
+            case "got":
+                const resources = getResourcesFromHTML(node.innerHTML)
+                for (let resource of resources) {
+                    player.updateResource(resource, 1);
+                }
+                break;
+            case "gave":
+                const tradingPartner = findPlayerByUsername(node.innerText.split(" ").slice(-1)[0]);
+                const tradedResources = getResourcesFromHTML(node.innerHTML.split("gave")[1].split("got")[0]);
+                const receivedResources = getResourcesFromHTML(node.innerHTML.split("got")[1]);
+
+                for (let resource of tradedResources) {
+                    player.updateResource(resource, -1);
+                    tradingPartner.updateResource(resource, 1)
+                }
+
+                for (let resource of receivedResources) {
+                    player.updateResource(resource, 1);
+                    tradingPartner.updateResource(resource, -1)
+                }
+                break;
+            case "built":
+                const building = node.innerText.split(" ").slice(-1)[0]
+                player.buildBuilding(building);
+            default:
+                console.log("Unknown action: " + action);
+        }
+        globalThis.updateText(players);
     }
     /*
     if (mutation[0].type === 'childList' && mutation[0].addedNodes[0]) {

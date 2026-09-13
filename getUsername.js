@@ -1,10 +1,9 @@
 'use strict';
 
 const getUsername = () => {
-    const usernameNode = document.getElementById('header_profile_username');
+    const usernameNode = document.getElementsByClassName('web-header-username')[0];
     if (usernameNode) {
-        console.log("Username found:", usernameNode.textContent.trim());
-        globalThis.USERNAME = usernameNode.textContent.trim();
+        globalThis.USERNAME = usernameNode.innerHTML;
         observer.disconnect(); 
     }
 };

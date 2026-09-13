@@ -2,49 +2,40 @@
 
 class Player {
   constructor(username) {
-      this.lumber = 0;
-      this.brick = 0;
-      this.wool = 0;
-      this.grain = 0;
-      this.ore = 0;
-      this.stolenFromPlayer = 0;
-      this.stolenByPlayer = 0;
+      this.Lumber = 0;
+      this.Brick = 0;
+      this.Wool = 0;
+      this.Grain = 0;
+      this.Ore = 0;
+      this.unknownResource = 0;
       this.username = username;
   }
 
   updateResource(resource, amount) {
       console.log("updating resource: " + resource + " by " + amount + " for " + this.username)
-      this[resource] += amount;
-
       if (this[resource] < 0) {
-        console.log("avoiding negative resource: " + resource + " for " + this.username)
-        const diff = Math.abs(this[resource]);
-        if(this.stolenByPlayer >= diff) {
-            this.stolenByPlayer -= diff;
-        } else {
-            this.stolenByPlayer = 0;
-        }
-        this[resource] = 0;
+          console.log("Negative resource: " + resource + " for " + this.username)
       }
-      this.resetIfRobbedOfAllResources();
+      
+      this[resource] += amount;
   }
 
   buildBuilding(building) {
     console.log("building: " + building + " for " + this.username)
     switch (building) {
-        case "settlement":
-            this.updateResource("lumber", -1);
-            this.updateResource("brick", -1);
-            this.updateResource("wool", -1);
-            this.updateResource("grain", -1);
+        case "Settlement":
+            this.updateResource("Lumber", -1);
+            this.updateResource("Brick", -1);
+            this.updateResource("Wool", -1);
+            this.updateResource("Grain", -1);
             break;
-        case "city":
-            this.updateResource("grain", -2);
-            this.updateResource("ore", -3);
+        case "City":
+            this.updateResource("Grain", -2);
+            this.updateResource("Ore", -3);
             break;
-        case "road":
-            this.updateResource("lumber", -1);
-            this.updateResource("brick", -1);
+        case "Road":
+            this.updateResource("Lumber", -1);
+            this.updateResource("Brick", -1);
             break;
         default:
             console.log("building not recognized: " + building);
@@ -53,12 +44,12 @@ class Player {
 
   buyDevelopmentCard() {
     console.log("buying development card for " + this.username)
-    this.updateResource("ore", -1);
-    this.updateResource("wool", -1);
-    this.updateResource("grain", -1);
+    this.updateResource("Ore", -1);
+    this.updateResource("Wool", -1);
+    this.updateResource("Grain", -1);
   }
 
-  stealFromPlayer(stolenFromPlayer, resource) {
+  /*stealFromPlayer(stolenFromPlayer, resource) {
       stolenFromPlayer.updateResource(resource, -1);
       this.updateResource(resource, 1);
   }
@@ -85,6 +76,6 @@ class Player {
 
     sumOfResources() {
         return this.brick + this.lumber + this.wool + this.grain + this.ore + this.stolenByPlayer;
-  }
+  }*/
 }
 globalThis.Player = Player;
