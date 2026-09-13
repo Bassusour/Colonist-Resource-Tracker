@@ -1,19 +1,19 @@
 'use strict';
 
-function usernameAvaliable() {
-    return !!document.getElementById('game-log-text');
-  }
+function gameStarted() {
+    return !!document.querySelector('.virtualScroller-lSkdkGJi');
+}
 
-if (usernameAvaliable()) {
+if (gameStarted()) {
     globalThis.startScript();
-  } else {
+} else {
     // Wait for the game to start
     const observer = new MutationObserver(function(mutationsList, observer) {
-      if (usernameAvaliable()) {
-        globalThis.startScript();
-        observer.disconnect();
-      }
+        if (gameStarted()) {
+          globalThis.startScript();
+          observer.disconnect();
+        }
     });
-  
-    observer.observe(document.body, { childList: true, subtree: true });
-  }
+
+  observer.observe(document.body, { childList: true, subtree: true });
+}

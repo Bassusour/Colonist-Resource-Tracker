@@ -1,11 +1,12 @@
 'use strict';
 
 var players = [];
+const seenLogIndexes = new Set();
 
 function startScript() {
     console.log("tracking started");
-    loadGameState();
-    var logDiv = document.getElementById('game-log-text');
+    // loadGameState();
+    var logDiv = document.getElementsByClassName("virtualScroller-lSkdkGJi")[0];
     var config = {childList: true};
     const observer = new MutationObserver(logObserver);
     observer.observe(logDiv,config);
@@ -42,16 +43,44 @@ function getResourcesOrBuildingFromInnerHTML(innerHTML) {
     return resources;
 }
 
-const logObserver = (mutation, observer) => {
-    if (mutation[0].type === 'childList') {
+const logObserver = (mutations, observer) => {
+    // console.log(mutations)
+    for (const mutation of mutations) {
+        if (mutation.type !== "childList") continue;
+
+        // Always only a single added node
+        const node = mutation.addedNodes[0]
+        if(!node) {
+            continue;
+        }
+        const index = node.dataset.index;
+        if (seenLogIndexes.has(index)) {
+            continue;
+        }
+
+        console.log("New log:", index, node.innerText);
+        console.log("InnerHTML: " + node.innerHTML)
+        seenLogIndexes.add(index);
+
+
+    }
+    /*
+    if (mutation[0].type === 'childList' && mutation[0].addedNodes[0]) {
+        console.log(mutation)
+
+
         const innerText = String(mutation[0].addedNodes[0].innerText)
         const innerHTML = String(mutation[0].addedNodes[0].innerHTML)
 
-        // Black span in log. Ignore
+        // console.log("innerText:" + innerText)
+        // console.log("innerHTML:" + innerHTML)
+
+        // Black span in log - ignore
         if(innerText == ""){
             return;
         }
 
+        console.log("innerText:" + innerText)
         var username = innerText.split(' ')[0];
         var action = innerText.substring(innerText.indexOf(" ") + 1);
 
@@ -151,13 +180,13 @@ const logObserver = (mutation, observer) => {
         }
         else if(action.includes("won the game!")) {
             console.log("Game over");
-            localStorage.removeItem('gameState');
+            // localStorage.removeItem('gameState');
             players = [];
             observer.disconnect();
             return;
         }
         globalThis.updateText(players);
-    }
+    }*/
   };
 
   function loadGameState() {

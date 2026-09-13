@@ -1,7 +1,7 @@
 'use strict';
 
 function setupMenu() {
-    var helpButtonsSection = document.getElementById('help_buttons_section');
+    var helpButtonsSection = document.getElementsByClassName("container-cVxpOtTU gameHelpButtonsLayer-odYlgrig")[0];
     // Can be delayed, so wait until it is loaded
     if(!helpButtonsSection) {
         window.setTimeout(setupMenu,500);
@@ -66,11 +66,11 @@ function updateText(players) {
     var text = "";
     for (var p of players) {
         text += p.username + ": " + 
-                p.lumber + " <img src=\"/dist/images/card_lumber.svg?v149\" width=\"14.25px\" height=\"20px\"> , " + 
-                p.brick  + " <img src=\"/dist/images/card_brick.svg?v149\" width=\"14.25px\" height=\"20px\">,  " +
-                p.wool + " <img src=\"/dist/images/card_wool.svg?v149\" width=\"14.25px\" height=\"20px\">, " + 
-                p.grain + " <img src=\"/dist/images/card_grain.svg?v149\" width=\"14.25px\" height=\"20px\">,  " +
-                p.ore + " <img src=\"/dist/images/card_ore.svg?v149\" width=\"14.25px\" height=\"20px\">";
+                p.lumber + " <img src=\"https://cdn.colonist.io/dist/assets/card_lumber.cf22f8083cf89c2a29e7.svg\" width=\"14.25px\" height=\"20px\"> , " + 
+                p.brick  + " <img src=\"https://cdn.colonist.io/dist/assets/card_brick.5950ea07a7ea01bc54a5.svg\" width=\"14.25px\" height=\"20px\">,  " +
+                p.wool + " <img src=\"https://cdn.colonist.io/dist/assets/card_wool.17a6dea8d559949f0ccc.svg\" width=\"14.25px\" height=\"20px\">, " + 
+                p.grain + " <img src=\"https://cdn.colonist.io/dist/assets/card_grain.09c9d82146a64bce69b5.svg\" width=\"14.25px\" height=\"20px\">,  " +
+                p.ore + " <img src=\"https://cdn.colonist.io/dist/assets/card_ore.117f64dab28e1c987958.svg\" width=\"14.25px\" height=\"20px\">";
         if(p.stolenFromPlayer != 0){
             text += ", stolenFrom: " + p.stolenFromPlayer + " <img src=\"/dist/images/card_rescardback.svg?v149\" width=\"14.25px\" height=\"20px\"> ";
         }
@@ -88,13 +88,6 @@ function displayMenu() {
     if(menu.style.display === "none") {
         menu.style.display = "block";
     } else {
-        menu.style.display = "none";
-    }
-}
-
-function correctNumberOfResourcesMenu() {
-    const menu = document.getElementById('resourceTrackerMenu');
-    if(menu.style.display === "block") {
         menu.style.display = "none";
     }
 }
