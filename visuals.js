@@ -22,19 +22,28 @@ function setupMenu() {
     resourceTrackerDiv.appendChild(menuDiv);
     helpButtonsSection.appendChild(resourceTrackerDiv);
 
+    btn.onmouseenter = function () {
+        btn.style.filter = 'grayscale(100%)';
+    };
+
+    btn.onmouseleave = function () {
+        btn.style.filter = 'none';
+    };
+
     btn.type = 'button';
     btn.style.position = 'relative';
     btn.style.width = '51.876px';
     btn.style.height = '51.876px';
     btn.style.left = '9%';
+    btn.style.backgroundColor = 'transparent';
+    btn.style.border = 'none';
+    btn.style.padding = '0';
+
     var imageUrl = chrome.runtime.getURL('images/gear.png');
-    btn.style.backgroundImage = `url(${imageUrl})`;
-    console.log(imageUrl)
-    // console.log(`chrome-extension://${chrome.runtime.id}/images/gear.png`)
-    // btn.style.backgroundColor = 'transparent';
+    btn.style.backgroundImage = `url("${imageUrl}")`;
+    btn.style.backgroundRepeat = "no-repeat";
+    btn.style.backgroundPosition = "center";
     btn.style.backgroundSize = 'contain';
-    btn.style.backgroundRepeat = 'no-repeat';
-    // btn.style.border = 'none';
     btn.onclick = function () { displayMenu(); };
 
     menuDiv.style.zIndex = 100;
@@ -45,7 +54,6 @@ function setupMenu() {
     menuDiv.style.left = '100%';
     menuDiv.style.whiteSpace = 'nowrap'; 
     menuDiv.style.backgroundImage = 'linear-gradient(to bottom,#fcfaf5,#e2d7c4)';
-    menuDiv.style.padding = '10px';
     menuDiv.style.color = 'black';
     menuDiv.style.zIndex = 100;
     menuDiv.style.display = 'none';

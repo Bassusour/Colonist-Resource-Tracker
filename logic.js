@@ -122,7 +122,7 @@ const logObserver = (mutations, observer) => {
         }
         createPlayerIfTheyDontExist(username);
 
-        const ignoreActions = ['has', 'wants', 'rolled', 'moved', 'placed', 'settling!']
+        const ignoreActions = ['has', 'wants', 'rolled', 'moved', 'placed', 'Paused', 'Resumed']
         if(ignoreActions.includes(action)) {
             continue;
         }
@@ -221,11 +221,13 @@ const logObserver = (mutations, observer) => {
                 break;
             case "used":
                 const cardType = node.innerText.split(" ")[2]
-                // Knight
-                // Year (from Year of Plenty)
+                
                 if(cardType == "Monopoly") {
                     lastUsedDevelopmentCard = "Monopoly"
-                }
+                } else if(cardType == "Knight") {
+                    lastUsedDevelopmentCard = "Knight"
+                } else if(cardType == "Year")
+                    lastUsedDevelopmentCard = "Year of Plenty"
                 break;
             case "took": // Year of plenty
                 const resources = getResourcesFromHTML(node.innerHTML)
