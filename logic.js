@@ -1,11 +1,39 @@
 'use strict';
 
 var players = [];
-const seenLogIndexes = new Set();
+var seenLogIndexes = new Set();
+var lastUsedDevelopmentCard;
+
+function loadGameState() {
+    const gameStateJSON = localStorage.getItem('gameState_' + window.location.href);
+    if (gameStateJSON) {
+        console.log("Game state found")
+        const gameState = JSON.parse(gameStateJSON);
+        if(gameState.players) {
+            players = gameState.players.map(savedPlayer => {
+                const player = new Player(savedPlayer.Username);
+                Object.assign(player, savedPlayer);
+                return player;
+            });
+            console.log("players: " + JSON.stringify(players))
+            console.log('Game state players loaded');
+        }
+
+        if(gameState.seenLogIndexes) {
+            seenLogIndexes = new Set(gameState.seenLogIndexes);
+            console.log("seenLogIndexes:", seenLogIndexes)
+            console.log('Game state log indexes loaded');
+        }
+        
+        globalThis.updateText(players);
+    } else {
+        console.log("No gamestate fonud");
+    }
+}
 
 function startScript() {
     console.log("tracking started");
-    // loadGameState();
+    loadGameState();
     var logDiv = document.getElementsByClassName("virtualScroller-lSkdkGJi")[0];
     var config = {childList: true};
     const observer = new MutationObserver(logObserver);
@@ -67,8 +95,6 @@ function useMonopoly(player, resource, amount) {
         stolenFromPlayer.updateUnknownLostResourceThroughMonopoly(resource);
     }
 }
-
-var lastUsedDevelopmentCard;
 
 const logObserver = (mutations, observer) => {
     // console.log(mutations)
@@ -201,42 +227,20 @@ const logObserver = (mutations, observer) => {
                     lastUsedDevelopmentCard = "Monopoly"
                 }
                 break;
-            case "took":
-                // Year of plenty
+            case "took": // Year of plenty
                 const resources = getResourcesFromHTML(node.innerHTML)
                 for (let resource of resources) {
                     player.updateResource(resource, 1);
                 }
                 break;
             case "won":
-                // Something about gamestate
-                break;
+                observer.disconnect();
+                localStorage.removeItem('gameState_' + window.location.href);
+                return;
             default:
                 console.log("Unknown action: " + action);
         }
         globalThis.updateText(players);
+        saveGameState(players, seenLogIndexes)
     }
-  };
-
-  function loadGameState() {
-    const gameStateJSON = localStorage.getItem('gameState');
-    if (gameStateJSON) {
-        const gameState = JSON.parse(gameStateJSON);
-        if(gameState.players && gameState.url === window.location.href){
-            players = gameState.players;
-            players.forEach(player => Object.setPrototypeOf(player, Player.prototype));
-            globalThis.updateText(players);
-            console.log('Game state loaded');
-        } else {
-            // The stored gamestate is from a different game
-            localStorage.removeItem('gameState');
-            console.log('Game state removed, because it was from a different game');
-        }
-        
-    }
-}
-
-// TODO list
-// - Load and save gamestate
-// - Possibility to remove local storage
-// - Check when a game is finished
+};
