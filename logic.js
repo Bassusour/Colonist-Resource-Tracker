@@ -4,33 +4,6 @@ var players = [];
 var seenLogIndexes = new Set();
 var lastUsedDevelopmentCard;
 
-function loadGameState() {
-    const gameStateJSON = localStorage.getItem('gameState_' + window.location.href);
-    if (gameStateJSON) {
-        console.log("Game state found")
-        const gameState = JSON.parse(gameStateJSON);
-        if(gameState.players) {
-            players = gameState.players.map(savedPlayer => {
-                const player = new Player(savedPlayer.Username);
-                Object.assign(player, savedPlayer);
-                return player;
-            });
-            console.log("players: " + JSON.stringify(players))
-            console.log('Game state players loaded');
-        }
-
-        if(gameState.seenLogIndexes) {
-            seenLogIndexes = new Set(gameState.seenLogIndexes);
-            console.log("seenLogIndexes:", seenLogIndexes)
-            console.log('Game state log indexes loaded');
-        }
-        
-        globalThis.updateText(players);
-    } else {
-        console.log("No gamestate fonud");
-    }
-}
-
 function startScript() {
     console.log("tracking started");
     loadGameState();

@@ -10,7 +10,7 @@
       ],
     "content_scripts": [ {
         "matches": ["https://colonist.io/*"],
-        "js": ["content-script.js", "logic.js", "player.js", "visuals.js", "getUsername.js", "saveGameState.js"],
+        "js": ["content-script.js", "logic.js", "player.js", "visuals.js", "getUsername.js", "gamestate.js"],
         "type": "module"
     }],
     "web_accessible_resources": [
