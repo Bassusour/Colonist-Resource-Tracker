@@ -163,6 +163,7 @@ const logObserver = (mutations, observer) => {
                     const amount = node.innerText.split(" ")[2];
 
                     useMonopoly(player, resource, amount);
+                    lastUsedDevelopmentCard = null;
                     break;
                 }
 

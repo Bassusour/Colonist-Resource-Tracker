@@ -40,7 +40,7 @@ class Player {
 
         this[resource] = newAmount;
 
-        if (this.getNumberOfCards == 0 && this.UnknownLostResource < 0) {
+        if (this.getNumberOfCards() == 0 && this.UnknownLostResource < 0) {
             console.log("Resetting resources due to UnknownLostResource representing all of them");
             this.Lumber = 0;
             this.Brick = 0;
