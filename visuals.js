@@ -64,6 +64,7 @@ function setupMenu() {
     menuDiv.style.color = 'black';
     menuDiv.style.zIndex = 100;
     menuDiv.style.display = 'none';
+    menuDiv.style.fontFamily = "monospace";
 
     
 }
@@ -78,16 +79,18 @@ function updateText(players) {
         console.log("Menu element not created yet");
         return; 
     }
+
+    const indentationLength = getCharsOfLongestUsername(players);
     var text = "";
     for (var p of players) {
-        text += p.Username + ": " + 
-                p.Lumber + " <img src=\"https://cdn.colonist.io/dist/assets/card_lumber.cf22f8083cf89c2a29e7.svg\" width=\"14.25px\" height=\"20px\"> , " + 
-                p.Brick  + " <img src=\"https://cdn.colonist.io/dist/assets/card_brick.5950ea07a7ea01bc54a5.svg\" width=\"14.25px\" height=\"20px\">,  " +
-                p.Wool + " <img src=\"https://cdn.colonist.io/dist/assets/card_wool.17a6dea8d559949f0ccc.svg\" width=\"14.25px\" height=\"20px\">, " + 
-                p.Grain + " <img src=\"https://cdn.colonist.io/dist/assets/card_grain.09c9d82146a64bce69b5.svg\" width=\"14.25px\" height=\"20px\">,  " +
-                p.Ore + " <img src=\"https://cdn.colonist.io/dist/assets/card_ore.117f64dab28e1c987958.svg\" width=\"14.25px\" height=\"20px\"> , " +
-                p.UnknownExtraResource + " <img src=\"https://cdn.colonist.io/dist/assets/card_rescardback.03c18312a76028b0d9c9.svg\" width=\"14.25px\" height=\"20px\"> , " +
-                p.UnknownLostResource + " <img src=\"https://cdn.colonist.io/dist/assets/card_rescardback.03c18312a76028b0d9c9.svg\" width=\"14.25px\" height=\"20px\">";
+        text += p.Username + ": " + "&nbsp;".repeat(indentationLength - p.Username.length) + 
+                p.Lumber + "<img src=\"https://cdn.colonist.io/dist/assets/card_lumber.cf22f8083cf89c2a29e7.svg\" width=\"14.25px\" height=\"20px\"> " + 
+                p.Brick  + "<img src=\"https://cdn.colonist.io/dist/assets/card_brick.5950ea07a7ea01bc54a5.svg\" width=\"14.25px\" height=\"20px\">  " +
+                p.Wool + "<img src=\"https://cdn.colonist.io/dist/assets/card_wool.17a6dea8d559949f0ccc.svg\" width=\"14.25px\" height=\"20px\"> " + 
+                p.Grain + "<img src=\"https://cdn.colonist.io/dist/assets/card_grain.09c9d82146a64bce69b5.svg\" width=\"14.25px\" height=\"20px\">  " +
+                p.Ore + "<img src=\"https://cdn.colonist.io/dist/assets/card_ore.117f64dab28e1c987958.svg\" width=\"14.25px\" height=\"20px\"> " +
+                p.UnknownExtraResource + "<img src=\"https://cdn.colonist.io/dist/assets/card_rescardback.03c18312a76028b0d9c9.svg\" width=\"14.25px\" height=\"20px\"> " +
+                p.UnknownLostResource + "<img src=\"https://cdn.colonist.io/dist/assets/card_rescardback.03c18312a76028b0d9c9.svg\" width=\"14.25px\" height=\"20px\">";
         text += " <br />";
     }
     menu.innerHTML = text;
@@ -101,4 +104,15 @@ function displayMenu() {
     } else {
         menu.style.display = "none";
     }
+}
+
+function getCharsOfLongestUsername(players) {
+    var currLongestLength = 0;
+    for (var p of players) {
+        if (p.Username.length > currLongestLength) {
+            currLongestLength = p.Username.length;
+        }
+    }
+
+    return currLongestLength;
 }
