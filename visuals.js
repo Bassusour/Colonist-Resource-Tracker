@@ -39,6 +39,13 @@ function setupMenu() {
     btn.style.border = 'none';
     btn.style.padding = '0';
 
+    // Avoid crash
+    if (chrome?.runtime?.getURL) {
+    var imageUrl = chrome.runtime.getURL('images/gear.png');
+    btn.style.backgroundImage = `url("${imageUrl}")`;
+    } else {
+        console.log("Extension context unavailable. Page probably needs refreshing.");
+    }
     var imageUrl = chrome.runtime.getURL('images/gear.png');
     btn.style.backgroundImage = `url("${imageUrl}")`;
     btn.style.backgroundRepeat = "no-repeat";

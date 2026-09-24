@@ -89,13 +89,18 @@ const logObserver = (mutations, observer) => {
         var username = node.innerText.split(' ')[0];
         const action = node.innerText.split(' ')[1];
 
+        const ignoreUsernames = ['Game', 'Half', 'Karma']
+        if(ignoreUsernames.includes(username)) {
+            continue;
+        }
+
         if(username == "You" || username == "you"){
             // May not be initialized properly
             username = globalThis.USERNAME
         }
         createPlayerIfTheyDontExist(username);
 
-        const ignoreActions = ['has', 'wants', 'rolled', 'moved', 'placed', 'Paused', 'Resumed']
+        const ignoreActions = ['has', 'wants', 'rolled', 'moved', 'placed', 'Paused', 'Resumed', 'settling!', 'is']
         if(ignoreActions.includes(action)) {
             continue;
         }
